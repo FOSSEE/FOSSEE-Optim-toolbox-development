@@ -258,8 +258,7 @@ bool getHessFromScilab(int n,int numConstr_,char name[], double *x,double *obj,d
 		if(getDoubleMatrixFromScilab(posFirstElementOnStackForSF, &x_rows, &x_cols, dest))
   		{
 			sciprint("No results ");
-			return 1;
-			
+			return 1;	
   		}
 	}	
 	return 0;

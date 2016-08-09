@@ -121,6 +121,7 @@ int cpp_intfmincon(char *fname)
 	BonminSetup bonmin;
 	bonmin.initializeOptionsAndJournalist();
 	bonmin.options()->SetStringValue("mu_oracle","loqo");
+	bonmin.options()->SetIntegerValue("bonmin.print_level",5);
     bonmin.options()->SetNumericValue("bonmin.integer_tolerance", *integertolerance);
     bonmin.options()->SetIntegerValue("bonmin.node_limit", (int)*maxnodes);
     bonmin.options()->SetNumericValue("bonmin.time_limit", *cputime);
@@ -136,13 +137,10 @@ int cpp_intfmincon(char *fname)
 	bb(bonmin);//process parameter file using Ipopt and do branch and bound using Cbc
 	}
 	catch(TNLPSolver::UnsolvedError *E) {
-	Scierror(999, "\nIpopt has failed to solve the problem!\n");
 	}
 	catch(OsiTMINLPInterface::SimpleError &E) {
-	  Scierror(999, "\nFailed to solve a problem!\n");
 	}
 	catch(CoinError &E) {
-	  Scierror(999, "\nFailed to solve a problem!\n");
 	}
 	rstatus=tminlp->returnStatus();
 

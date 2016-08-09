@@ -24,6 +24,7 @@ tbx_build_gateway(toolboxTitle, functionNames, files, path, [], Linker_Flag, C_F
 link(lib_path + '/libcoinblas.so')
 link(lib_path + '/libcoinlapack.so')
 link(lib_path + '/libCoinUtils.so');
+link(lib_path + '/libcoinmumps.so');
 link(lib_path + '/libClp.so');
 link(lib_path + '/libClpSolver.so');
 link(lib_path + '/libOsi.so');
@@ -36,9 +37,7 @@ link(lib_path + '/libipopt.so');
 
 link(lib_path + '/libcoinblas.so');
 link(lib_path + '/libcoinlapack.so');
-link(lib_path + '/libcoinmumps.so');
 link(lib_path + '/libbonmin.so');
-
 exec (path + 'loader.sce');
 exec (sci_path + 'Checktype.sci');
 exec (sci_path + 'Checkvector.sci');

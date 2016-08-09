@@ -207,14 +207,14 @@ function [xopt,fopt,exitflag,gradient,hessian] = intfmincon (varargin)
 
   //To check for correct size of A(3rd paramter)
   if(size(A,2)~=nbVar & size(A,2)~=0) then
-    errmsg = msprintf(gettext("%s: Expected Matrix of size (No of linear inequality constraints X No of Variables) or an Empty Matrix for Linear Inequality Constraint coefficient Matrix A"), solver_name);
+    errmsg = msprintf(gettext("%s: Expected Matrix of size (No of linear inequality constraints X No of Variables) or an Empty Matrix for Linear Inequality Constraint coefficient Matrix A"), intfmincon);
     error(errmsg);
   end
   nbConInEq=size(A,"r");
 
   //To check for the correct size of Aeq (5th paramter)
   if(size(Aeq,2)~=nbVar & size(Aeq,2)~=0) then
-    errmsg = msprintf(gettext("%s: Expected Matrix of size (No of linear equality constraints X No of Variables) or an Empty Matrix for Linear Equality Constraint coefficient Matrix Aeq"), solver_name);
+    errmsg = msprintf(gettext("%s: Expected Matrix of size (No of linear equality constraints X No of Variables) or an Empty Matrix for Linear Equality Constraint coefficient Matrix Aeq"), intfmincon);
     error(errmsg);
   end
   nbConEq=size(Aeq,"r");
@@ -340,18 +340,18 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
 
   if (type(nlc) == 13 | type(nlc) == 11) then    
       if(execstr('[sample_c,sample_ceq] = nlc(x0)','errcatch')==21) then
-        errmsg = msprintf(gettext("%s: Non-Linear Constraint function and x0 did not match"), solver_name);
+        errmsg = msprintf(gettext("%s: Non-Linear Constraint function and x0 did not match"), intfmincon);
         error(errmsg);
       end
       numNlic = size(sample_c,"*");
       numNlec = size(sample_ceq,"*");
-      numNlc = no_nlic + no_nlec;
+      numNlc = numNlic + numNlec;
   end
 
   /////////////// Creating conLb and conUb ////////////////////////
 
-  conLb = [repmat(-%inf,nbConInEq,1);beq;repmat(-%inf,numNlic,1);repmat(0,numNlic,1);]
-  conUb = [b;beq;repmat(0,numNlic,1);repmat(0,numNlic,1);]
+  conLb = [repmat(-%inf,numNlic,1);repmat(0,numNlec,1);repmat(-%inf,nbConInEq,1);beq;]
+  conUb = [repmat(0,numNlic,1);repmat(0,numNlec,1);b;beq;]
 
   //Converting the User defined Objective function into Required form (Error Detectable)
   function [y,check] = _f(x)
@@ -386,17 +386,13 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
     endfunction
 
     function [y,check] = _addnlc(x)
-    x= x(:);
-    c=[]
-    ceq = [];
+    x= x(:)
       try
-        if(type(nlc) == 13 & numNlc~=0) then
-          {
-            [c,ceq] = nlc(x);
-          }
+        if((type(nlc) == 13 | type(nlc) == 11) & numNlc~=0) then
+           [c,ceq]=nlc(x)
         end
         ylin = [A*x;Aeq*x];
-        y = [ylin;c(:);ceq(:)];
+        y = [c(:);ceq(:);ylin(:);];
         [y,check] = checkIsreal(y)
       catch
         y=0;
@@ -404,11 +400,11 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
       end
     endfunction
 
-    //Defining an inbuilt Objective gradient function 
+    //Defining an inbuilt jacobian of constraints function 
     function [dy,check] = _gradnlc(x) 
       if (options(16) =="on") then
         try
-          [y,dy]=_addnlc(x)
+          [y,dy]=nlc(x)
           [dy,check] = checkIsreal(dy)
         catch
           dy = 0;
@@ -427,6 +423,7 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
 
   //Defining a function to calculate Hessian if the respective user entry is OFF 
   function [hessy,check]=_gradhess(x,obj_factor,lambda)
+  x=x(:);
     if (type(options(14)) == "function") then
       try
         [obj,dy,hessy] = fun(x,obj_factor,lambda)
@@ -437,17 +434,15 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
       end
     else
       try
-        [dy,hessfy]=numderivative(_f,x,%eps^(1/3),1,"blockmat");
-        hessny = []
-        if(type(nlc) == 13 & numNlc~=0) then
-        {
-          [dy,hessny] = numderivative(_addnlc,x,%eps^(1/3),1,"blockmat");
-        }
+        [dy,hessfy]=numderivative(_f,x)
+        hessfy = matrix(hessfy,nbVar,nbVar)
+        if((type(nlc) == 13 | type(nlc) == 11) & numNlc~=0) then
+          [dy,hessny]=numderivative(nlc,x)
         end
         hessianc = []
-          for i = 1:numNlc
-                    hessianc = hessianc + lambda(i)*hessny((i-1)*nbVar+1:nbVar*i,:)
-          end
+        for i = 1:numNlc
+            hessianc = hessianc + lambda(i)*matrix(hessny(i,:),nbVar,nbVar)
+        end
         hessy = obj_factor*hessfy + hessianc;
         [hessy,check] =  checkIsreal(hessy)
       catch
@@ -457,7 +452,7 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
     end
   endfunction
 
-    intconsize = size(intcon,"*");
+    intconsize = size(intcon,"*")
 
 	[xopt,fopt,exitflag] = inter_fmincon(_f,_gradf,_addnlc,_gradnlc,_gradhess,x0,lb,ub,conLb,conUb,intcon,options,nbConInEq+nbConEq);
 
@@ -466,7 +461,7 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
       gradient = [];
       hessian = [];
     else
-      [ gradient, hessian] = numderivative(_f, xopt, [], [], "blockmat");
+      [ gradient, hessian] = numderivative(_f, xopt)
     end
 
     //To print output message
@@ -495,7 +490,7 @@ function [y, check] = checkIsreal(x)
     y = 0
     check=1;
   else
-        y = x;
+    y = x;
     check=0;
   end 
 endfunction

@@ -27,7 +27,7 @@ extern "C"
 using namespace Ipopt;
 using namespace Bonmin;
 
-#define DEBUG 0
+//#define DEBUG 0
 
 minconTMINLP::~minconTMINLP()
 {
@@ -37,6 +37,9 @@ minconTMINLP::~minconTMINLP()
 // Set the type of every variable - CONTINUOUS or INTEGER
 bool minconTMINLP::get_variables_types(Index n, VariableType* var_types)
 {
+	#ifdef DEBUG
+  		sciprint("Code is in get_variables_types\n");
+	#endif
   n = numVars_;
   for(int i=0; i < n; i++)
     var_types[i] = CONTINUOUS;
@@ -48,6 +51,9 @@ bool minconTMINLP::get_variables_types(Index n, VariableType* var_types)
 // The linearity of the variables - LINEAR or NON_LINEAR
 bool minconTMINLP::get_variables_linearity(Index n, Ipopt::TNLP::LinearityType* var_types)
 {  
+	#ifdef DEBUG
+  		sciprint("Code is in get_variables_linearity\n");
+	#endif
 	for(int i=0;i<n;i++)
 	{
 		  var_types[i] = Ipopt::TNLP::NON_LINEAR;
@@ -57,6 +63,10 @@ bool minconTMINLP::get_variables_linearity(Index n, Ipopt::TNLP::LinearityType* 
 // The linearity of the constraints - LINEAR or NON_LINEAR
 bool minconTMINLP::get_constraints_linearity(Index m, Ipopt::TNLP::LinearityType* const_types)
 {	
+
+	#ifdef DEBUG
+  		sciprint("Code is in get_constraints_linearity\n");
+	#endif
 	for(int i=0;i<numLC_;i++)
 	{
 		const_types[i] = Ipopt::TNLP::LINEAR;
@@ -71,6 +81,9 @@ bool minconTMINLP::get_constraints_linearity(Index m, Ipopt::TNLP::LinearityType
 //get NLP info such as number of variables,constraints,no.of elements in jacobian and hessian to allocate memory
 bool minconTMINLP::get_nlp_info(Index& n, Index& m, Index& nnz_jac_g, Index& nnz_h_lag, TNLP::IndexStyleEnum& index_style)
 {
+	#ifdef DEBUG
+  		sciprint("Code is in get_nlp_info\n");
+	#endif
 	n=numVars_; // Number of variables
 	m=numCons_; // Number of constraints
 	nnz_jac_g = n*m; // No. of elements in Jacobian of constraints 
@@ -97,6 +110,57 @@ bool minconTMINLP::get_bounds_info(Index n, Number* x_l, Number* x_u, Index m, N
         g_u[i]=conUb_[i];
 	}
 	return true;
+}
+
+// This method sets initial values for required vectors . For now we are assuming 0 to all values. 
+bool minconTMINLP::get_starting_point(Index n, bool init_x, Number* x,bool init_z, Number* z_L, Number* z_U,Index m, bool init_lambda,Number* lambda)
+{
+ 	assert(init_x == true);
+  	assert(init_z == false);
+  	assert(init_lambda == false);
+	if (init_x == true)
+	{ //we need to set initial values for vector x
+		for (Index var=0;var<n;var++)
+			{x[var]=x0_[var];}//initialize with 0.
+	}
+	return true;
+}
+
+//get value of objective function at vector x
+bool minconTMINLP::eval_f(Index n, const Number* x, bool new_x, Number& obj_value)
+{	
+	#ifdef DEBUG
+  		sciprint("Code is eval_f\n");
+	#endif	
+  	char name[20]="_f";
+	Number *obj;
+	if (getFunctionFromScilab(n,name,x, 7, 1,2,&obj))
+	{
+		return false;
+	}
+	obj_value = *obj;
+  	return true;
+}
+
+//get value of gradient of objective function at vector x.
+bool minconTMINLP::eval_grad_f(Index n, const Number* x, bool new_x, Number* grad_f)
+{
+	#ifdef DEBUG
+  		sciprint("Code is in eval_grad_f\n");
+	#endif	
+	char name[20]="_gradf";
+  	Number *resg;
+	if (getFunctionFromScilab(n,name,x, 7, 1,2,&resg))
+	{
+		return false;
+	}
+	
+	Index i;
+	for(i=0;i<numVars_;i++)
+	{
+		grad_f[i]=resg[i];
+	}
+  	return true;
 }
 
 // return the value of the constraints: g(x)
@@ -145,7 +209,7 @@ bool minconTMINLP::eval_jac_g(Index n, const Number* x, bool new_x,Index m, Inde
 		else
 		{
 			unsigned int i,j,idx=0;
-			for(int i=0;i<m;i++)
+			for(i=0;i<m;i++)
 				for(j=0;j<n;j++)
 				{
 					iRow[idx]=i;
@@ -182,58 +246,6 @@ bool minconTMINLP::eval_jac_g(Index n, const Number* x, bool new_x,Index m, Inde
   	return true;
 }
 
-//get value of objective function at vector x
-bool minconTMINLP::eval_f(Index n, const Number* x, bool new_x, Number& obj_value)
-{	
-	#ifdef DEBUG
-  		sciprint("Code is eval_f\n");
-	#endif	
-  	char name[20]="_f";
-	Number *obj;
-	if (getFunctionFromScilab(n,name,x, 7, 1,2,&obj))
-	{
-		return false;
-	}
-	obj_value = *obj;
-  	return true;
-}
-
-//get value of gradient of objective function at vector x.
-bool minconTMINLP::eval_grad_f(Index n, const Number* x, bool new_x, Number* grad_f)
-{
-	#ifdef DEBUG
-  		sciprint("Code is in eval_grad_f\n");
-	#endif	
-	char name[20]="_gradf";
-  	Number *resg;
-	if (getFunctionFromScilab(n,name,x, 7, 1,2,&resg))
-	{
-		return false;
-	}
-	
-	Index i;
-	for(i=0;i<numVars_;i++)
-	{
-		grad_f[i]=resg[i];
-	}
-
-  	return true;
-}
-
-// This method sets initial values for required vectors . For now we are assuming 0 to all values. 
-bool minconTMINLP::get_starting_point(Index n, bool init_x, Number* x,bool init_z, Number* z_L, Number* z_U,Index m, bool init_lambda,Number* lambda)
-{
- 	assert(init_x == true);
-  	assert(init_z == false);
-  	assert(init_lambda == false);
-	if (init_x == true)
-	{ //we need to set initial values for vector x
-		for (Index var=0;var<n;var++)
-			{x[var]=x0_[var];}//initialize with 0.
-	}
-	return true;
-}
-
 /*
  * Return either the sparsity structure of the Hessian of the Lagrangian, 
  * or the values of the Hessian of the Lagrangian  for the given values for
@@ -251,26 +263,27 @@ bool minconTMINLP::eval_h(Index n, const Number* x, bool new_x,Number obj_factor
 		Index idx=0;
 		for (Index row = 0; row < numVars_; row++) 
 		{
-			for (Index col = 0; col <= row; col++)
-			{	iRow[idx] = row;
+			for (Index col = 0; col < numVars_; col++)
+			{
+				iRow[idx] = row;
 				jCol[idx] = col;
 				idx++;
 		  	}
 		}
-	}
+	}	
 	else 
 	{	char name[20]="_gradhess";
-	  	Number *resh;
-		if (getHessFromScilab(n,m,name,x, &obj_factor, lambda, 7, 3,2,&resh))
+	  	Number *resCh;
+		if (getHessFromScilab(n,m,name,x, &obj_factor, lambda, 7, 3,2,&resCh))
 		{
 			return false;
 		}
 		Index index=0;
 		for (Index row=0;row < numVars_ ;++row)
 		{
-			for (Index col=0; col <= row; ++col)
+			for (Index col=0; col < numVars_; ++col)
 			{
-				values[index++]=(resh[numVars_*row+col]);
+				values[index++]=resCh[numVars_*row+col];
 			}
 		}
 	}
@@ -281,18 +294,18 @@ void minconTMINLP::finalize_solution(SolverReturn status,Index n, const Number* 
 {
 	#ifdef DEBUG
   		sciprint("Code is in finalize_solution\n");
+  		sciprint("%d",status);
 	#endif	
 	finalObjVal_ = obj_value;
 	status_ = status;
 	if(status==0 ||status== 3)
 	{
-		finalX_ = (double*)malloc(sizeof(double) * numVars_ * 1);
+		finalX_ = (double*)malloc(sizeof(double) * numVars_*1);
 		for (Index i=0; i<numVars_; i++) 
 		{
 	    		 finalX_[i] = x[i];
 		}
 	}
-
 }
 
 const double * minconTMINLP::getX()
