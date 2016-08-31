@@ -47,6 +47,7 @@ exec (sci_path + 'Checkrhs.sci');
 exec (sci_path + 'intfminunc.sci');
 exec (sci_path + 'intfminbnd.sci');
 exec (sci_path + 'intfmincon.sci');
+exec (sci_path + 'intfminimax.sci');
 
 //help_from_sci(sci_path + 'intqpipopt.sci', help_dir, demos_dir);
 //xmltojar(help_dir, toolboxTitle);

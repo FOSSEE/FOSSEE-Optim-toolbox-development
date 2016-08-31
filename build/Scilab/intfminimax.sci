@@ -9,7 +9,7 @@
 // Organization: FOSSEE, IIT Bombay
 // Email: toolbox@scilab.in
 
-function [x,fval,maxfval,exitflag,output,lambda] = intfminimax(varargin)
+function [x,fval,maxfval,exitflag] = intfminimax(varargin)
     // Solves minimax constraint problem
     //
     // Calling Sequence
@@ -22,8 +22,6 @@ function [x,fval,maxfval,exitflag,output,lambda] = intfminimax(varargin)
     //  [xopt, fval] = intfminimax(.....)
     //  [xopt, fval, maxfval]= intfminimax(.....)
     //  [xopt, fval, maxfval, exitflag]= intfminimax(.....)
-    //  [xopt, fval, maxfval, exitflag, output]= intfminimax(.....)
-    //  [xopt, fval, maxfval, exitflag, output, lambda]= intfminimax(.....)
     //
     // Parameters
     //  fun: The function to be minimized. fun is a function that accepts a vector x and returns a vector F, the objective functions evaluated at x.
@@ -122,7 +120,7 @@ function [x,fval,maxfval,exitflag,output,lambda] = intfminimax(varargin)
 	//	intcon = [1]
     //  maxfopt = 0
     //  // Run fminimax
-    //  [x,fval,maxfval,exitflag,output,lambda] = fminimax(myfun, x0,intcon)
+    //  [x,fval,maxfval,exitflag] = intfminimax(myfun, x0,intcon)
 	// // Press ENTER to continue
 	//
     // Examples
@@ -154,8 +152,7 @@ function [x,fval,maxfval,exitflag,output,lambda] = intfminimax(varargin)
     //      x0 = [0,10];
     //      intcon = [2]
     //      // Run intfminimax
-    //      [x,fval,maxfval,exitflag,output] = intfminimax(myfun,x0,intcon,[],[],[],[],[],[], confun, minimaxOptions)
-    //
+    //      [x,fval,maxfval,exitflag] = intfminimax(myfun,x0,intcon,[],[],[],[],[],[], confun, minimaxOptions)
     // Authors
     // Harpreet Singh
 
@@ -271,8 +268,9 @@ function [x,fval,maxfval,exitflag,output,lambda] = intfminimax(varargin)
     else
         minmaxNonlinfun = varargin(10)
     end
-
-    Checktype("fminimax", minmaxNonlinfun, "nonlinfun", 10, "function")
+	if(minmaxNonlinfun<>[]) then
+	    Checktype("fminimax", minmaxNonlinfun, "nonlinfun", 10, "function")
+	end
 
     //To check, Whether minimaxOptions is been entered by user
     if ( minmaxRhs<11 ) then
@@ -415,7 +413,11 @@ minmaxoptions = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d
     function [nc,nceq,dnc,dnceq] = newNonlinfun(z)
 		dnc = [];
 		dnceq = [];
-        [nc,nceq] = minmaxNonlinfun(z)
+		nc = [];
+		nceq= [];
+		if (minmaxNonlinfun<>[]) then
+	        [nc,nceq] = minmaxNonlinfun(z)
+		end
         // add inequalities of the form Fi(x) - y <= 0
         tmp = [minmaxObjfun(z) - z(minmaxNumvar+1)]'
         nc = [nc, tmp]
@@ -425,7 +427,9 @@ minmaxoptions = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d
             dnceq = [dnceq, zeros(size(dnceq,'r'),1)]
         else
             // else use numderivative method to calculate gradient of constraints
-            [dnc, dnceq] = minmaxNonlinDer(z)
+			if (minmaxNonlinfun<>[]) then
+            	[dnc, dnceq] = minmaxNonlinDer(z)
+			end
 		end
 		
 		if(options(12) =="on") then
@@ -443,12 +447,11 @@ minmaxoptions = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d
 		options(14)="on";
 	end
 
-	options(12)="off";
-
+	minmaxoptions(12)="off";
     [x,fval,exitflag,gradient,hessian] = ...
     intfmincon(newObjfun,minmaxStartpoint,intcon,minmaxA,minmaxB,minmaxAeq,minmaxBeq,minmaxLb,minmaxUb,newNonlinfun,minmaxoptions)
 
     x = x(1:minmaxNumvar)
-    fval = minmaxObjun(x)
+    fval = minmaxObjfun(x)
     maxfval = max(fval)
 endfunction
