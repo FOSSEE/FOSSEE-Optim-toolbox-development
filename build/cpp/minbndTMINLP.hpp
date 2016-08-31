@@ -5,7 +5,7 @@
 // you should have received as part of this distribution.  The terms
 // are also available at
 // http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
-// Author: Harpreet Singh, Pranav Deshpande and Akshay Miterani
+// Author: Harpreet Singh
 // Organization: FOSSEE, IIT Bombay
 // Email: toolbox@scilab.in
 

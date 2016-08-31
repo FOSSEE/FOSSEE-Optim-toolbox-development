@@ -60,3 +60,6 @@ function errmsg = Checktype ( funname , var , varname , ivar , expectedtype )
     error(errmsg);
   end
 endfunction
+
+
+

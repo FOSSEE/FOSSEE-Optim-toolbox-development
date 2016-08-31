@@ -10,48 +10,53 @@
 // Email: toolbox@scilab.in
 
 function [xopt,fopt,exitflag,gradient,hessian] = intfmincon (varargin)
-  // Solves a constrainted multi-variable mixed integer non linear programming problem
-  //
-  //   Calling Sequence
-  //   xopt = intfmincon(f,x0,intcon,A,b)
-  //   xopt = intfmincon(f,x0,intcon,A,b,Aeq,beq)
-  //   xopt = intfmincon(f,x0,intcon,A,b,Aeq,beq,lb,ub)
-  //   xopt = intfmincon(f,x0,intcon,A,b,Aeq,beq,lb,ub,nlc)
-  //   xopt = intfmincon(f,x0,intcon,A,b,Aeq,beq,lb,ub,nlc,options)
-  //   [xopt,fopt] = intfmincon(.....)
-  //   [xopt,fopt,exitflag]= intfmincon(.....)
-  //   [xopt,fopt,exitflag,gradient]=intfmincon(.....)
-  //   [xopt,fopt,exitflag,gradient,hessian]=intfmincon(.....)
+	// Solves a constrainted multi-variable mixed integer non linear programming problem
+	//
+	//   Calling Sequence
+	//   xopt = intfmincon(f,x0,intcon,A,b)
+	//   xopt = intfmincon(f,x0,intcon,A,b,Aeq,beq)
+	//   xopt = intfmincon(f,x0,intcon,A,b,Aeq,beq,lb,ub)
+	//   xopt = intfmincon(f,x0,intcon,A,b,Aeq,beq,lb,ub,nlc)
+	//   xopt = intfmincon(f,x0,intcon,A,b,Aeq,beq,lb,ub,nlc,options)
+	//   [xopt,fopt] = intfmincon(.....)
+	//   [xopt,fopt,exitflag]= intfmincon(.....)
+	//   [xopt,fopt,exitflag,gradient]=intfmincon(.....)
+	//   [xopt,fopt,exitflag,gradient,hessian]=intfmincon(.....)
 	//
 	//   Parameters
 	//   f : a function, representing the objective function of the problem 
-  //   x0 : a vector of doubles, containing the starting values of variables. 
-  //   intcon : a vector of integers, represents which variables are constrained to be integers
-  //   A : a matrix of double, represents the linear coefficients in the inequality constraints A⋅x ≤ b. 
-  //   b : a vector of double, represents the linear coefficients in the inequality constraints A⋅x ≤ b.
-  //   Aeq : a matrix of double, represents the linear coefficients in the equality constraints Aeq⋅x = beq.
-  //   beq : a vector of double, represents the linear coefficients in the equality constraints Aeq⋅x = beq.
-  //   lb : Lower bounds, specified as a vector or array of double. lb represents the lower bounds elementwise in lb ≤ x ≤ ub.
-  //   ub : Upper bounds, specified as a vector or array of double. ub represents the upper bounds elementwise in lb ≤ x ≤ ub.
-  //   nlc : a function, representing the Non-linear Constraints functions(both Equality and Inequality) of the problem. It is declared in such a way that non-linear inequality constraints are defined first as a single row vector (c), followed by non-linear equality constraints as another single row vector (ceq). Refer Example for definition of Constraint function.
-  //   options : a list, containing the option for user to specify. See below for details. 
-  //   xopt : a vector of doubles, containing the the computed solution of the optimization problem.
-  //   fopt : a scalar of double, containing the the function value at x.
-  //   exitflag : a scalar of integer, containing the flag which denotes the reason for termination of algorithm. See below for details.
-  //   gradient : a vector of doubles, containing the Objective's gradient of the solution.
-  //   hessian  : a matrix of doubles, containing the Objective's hessian of the solution.
-  //
-	//   Description
-	//   Search the minimum of a multi-variable function on bounded interval specified by :
-	//   Find the minimum of f(x) such that 
+	//   x0 : a vector of doubles, containing the starting values of variables. 
+	//   intcon : a vector of integers, represents which variables are constrained to be integers
+	//   A : a matrix of double, represents the linear coefficients in the inequality constraints A⋅x ≤ b. 
+	//   b : a vector of double, represents the linear coefficients in the inequality constraints A⋅x ≤ b.
+	//   Aeq : a matrix of double, represents the linear coefficients in the equality constraints Aeq⋅x = beq.
+	//   beq : a vector of double, represents the linear coefficients in the equality constraints Aeq⋅x = beq.
+	//   lb : Lower bounds, specified as a vector or array of double. lb represents the lower bounds elementwise in lb ≤ x ≤ ub.
+	//   ub : Upper bounds, specified as a vector or array of double. ub represents the upper bounds elementwise in lb ≤ x ≤ ub.
+	//   nlc : a function, representing the Non-linear Constraints functions(both Equality and Inequality) of the problem. It is declared in such a way that non-linear inequality constraints are defined first as a single row vector (c), followed by non-linear equality constraints as another single row vector (ceq). Refer Example for definition of Constraint function.
+	//   options : a list, containing the option for user to specify. See below for details. 
+	//   xopt : a vector of doubles, containing the the computed solution of the optimization problem.
+	//   fopt : a scalar of double, containing the the function value at x.
+	//   exitflag : a scalar of integer, containing the flag which denotes the reason for termination of algorithm. See below for details.
+	//   gradient : a vector of doubles, containing the Objective's gradient of the solution.
+	//   hessian  : a matrix of doubles, containing the Objective's hessian of the solution.
 	//
-	//   <latex>
-	//    \begin{eqnarray}
-	//    &\mbox{min}_{x}
-	//    & f(x)\\
-	//    & \text{subject to} & x1 \ < x \ < x2 \\
-	//    \end{eqnarray}
-	//   </latex>
+	//   Description
+  	//   Search the minimum of a mixed integer constrained optimization problem specified by :
+  	//   Find the minimum of f(x) such that 
+  	//
+  	//   <latex>
+  	//    \begin{eqnarray}
+  	//    &\mbox{min}_{x}
+  	//    & f(x) \\
+  	//    & \text{subject to} & A*x \leq b \\
+  	//    & & Aeq*x \ = beq\\
+  	//	  & & c(x) \leq  0\\
+  	//    & & ceq(x) \ =  0\\
+  	//    & & lb \leq x \leq ub \\
+	//    & & x_i \in \!\, \mathbb{Z}, i \in \!\, I
+  	//    \end{eqnarray}
+  	//   </latex>
 	//
 	//   The routine calls Bonmin for solving the Bounded Optimization problem, Bonmin is a library written in C++.
 	//
@@ -72,65 +77,146 @@ function [xopt,fopt,exitflag,gradient,hessian] = intfmincon (varargin)
 	// The exitflag allows to know the status of the optimization which is given back by Ipopt.
 	// <itemizedlist>
 	//   <listitem>exitflag=0 : Optimal Solution Found </listitem>
-	//   <listitem>exitflag=1 : Maximum Number of Iterations Exceeded. Output may not be optimal.</listitem>
-	//   <listitem>exitflag=2 : Maximum CPU Time exceeded. Output may not be optimal.</listitem>
-	//   <listitem>exitflag=3 : Stop at Tiny Step.</listitem>
-	//   <listitem>exitflag=4 : Solved To Acceptable Level.</listitem>
-	//   <listitem>exitflag=5 : Converged to a point of local infeasibility.</listitem>
+	//   <listitem>exitflag=1 : InFeasible Solution.</listitem>
+	//   <listitem>exitflag=2 : Objective Function is Continuous Unbounded.</listitem>
+	//   <listitem>exitflag=3 : Limit Exceeded.</listitem>
+	//   <listitem>exitflag=4 : User Interrupt.</listitem>
+	//   <listitem>exitflag=5 : MINLP Error.</listitem>
 	// </itemizedlist>
 	//
 	// For more details on exitflag see the Bonmin documentation, go to http://www.coin-or.org/Bonmin
-  //
-	// Examples
-	//	//Find x in R^6 such that it minimizes:
-	//    //f(x)= sin(x1) + sin(x2) + sin(x3) + sin(x4) + sin(x5) + sin(x6)
-	//	//-2 <= x1,x2,x3,x4,x5,x6 <= 2
-	//    //Objective function to be minimised
-	//    function y=f(x)
-	//		y=0
-	//		for i =1:6
-	//			y=y+sin(x(i));
-	//		end	
-	//	endfunction
-	//	//Variable bounds  
-	//	x1 = [-2, -2, -2, -2, -2, -2];
-	//  x2 = [2, 2, 2, 2, 2, 2];
-  //  intcon = [2 3 4]
-	//	//Options
-	//	options=list("MaxIter",[1500],"CpuTime", [100])
-	//	[x,fval] =intfmincon(f ,intcon, x1, x2, options)
-  // // Press ENTER to continue
-	//
-	// Examples
-	//	//Find x in R such that it minimizes:
-	//    //f(x)= 1/x^2
-	//	//0 <= x <= 1000
-	//    //Objective function to be minimised
-	//    function y=f(x)
-	//		   y=1/x^2;
-	//	  endfunction
-	//	//Variable bounds  
-	//	x1 = [0];
-	//  x2 = [1000];
-  //  intcon = [1];
-	//	[x,fval,exitflag,output,lambda] =intfmincon(f,intcon , x1, x2)
-  // // Press ENTER to continue
-	//
-	// Examples
-	//    //The below problem is an unbounded problem:
-	//	//Find x in R^2 such that it minimizes:
-	//    //f(x)= -[(x1-1)^2 + (x2-1)^2]
-	//	//-inf <= x1,x2 <= inf
-	//    //Objective function to be minimised
-	//    function y=f(x)
-	// 		y=-((x(1)-1)^2+(x(2)-1)^2);
-	//	endfunction
-	//	//Variable bounds  
-	//	x1 = [-%inf , -%inf];
-	//  x2 = [ %inf , %inf];
-	//	//Options
-	//	options=list("MaxIter",[1500],"CpuTime", [100])
-	//	[x,fval,exitflag,output,lambda] =intfmincon(f,intcon, x1, x2, options)  
+  	//
+  	// Examples
+  	//	//Find x in R^2 such that it minimizes:
+  	//    //f(x)= -x1 -x2/3
+  	//    //x0=[0,0]
+  	//    //constraint-1 (c1): x1 + x2 <= 2
+  	//    //constraint-2 (c2): x1 + x2/4 <= 1 
+  	//    //constraint-3 (c3): x1 - x2 <= 2
+  	//    //constraint-4 (c4): -x1/4 - x2 <= 1
+  	//    //constraint-5 (c5): -x1 - x2 <= -1
+  	//    //constraint-6 (c6): -x1 + x2 <= 2
+  	//    //constraint-7 (c7): x1 + x2 = 2  
+  	//    //Objective function to be minimised
+  	//  function [y,dy]=f(x)
+  	//		y=-x(1)-x(2)/3;
+	//		dy= [-1,-1/3];
+  	//	endfunction
+  	//	//Starting point, linear constraints and variable bounds  
+  	//	x0=[0 , 0];
+	//  intcon = [1]
+  	//	A=[1,1 ; 1,1/4 ; 1,-1 ; -1/4,-1 ; -1,-1 ; -1,1];
+  	//	b=[2;1;2;1;-1;2];
+  	//	Aeq=[1,1];
+  	// 	beq=[2];
+  	//	lb=[];
+  	//	ub=[];
+  	//  nlc=[];
+  	//	//Options
+  	//	options=list("GradObj", "on");
+  	//    //Calling Ipopt
+  	//	[x,fval,exitflag,grad,hessian] =intfmincon(f, x0,intcon,A,b,Aeq,beq,lb,ub,nlc,options)
+	// // Press ENTER to continue
+  	//
+  	// Examples
+  	//	//Find x in R^3 such that it minimizes:
+  	//    //f(x)= x1*x2 + x2*x3
+  	//    //x0=[0.1 , 0.1 , 0.1]
+  	//    //constraint-1 (c1): x1^2 - x2^2 + x3^2 <= 2
+  	//    //constraint-2 (c2): x1^2 + x2^2 + x3^2 <= 10  
+  	//    //Objective function to be minimised
+  	//  function [y,dy]=f(x)
+  	//		y=x(1)*x(2)+x(2)*x(3);
+  	//		dy= [x(2),x(1)+x(3),x(2)];
+  	//	endfunction
+  	//	//Starting point, linear constraints and variable bounds  
+  	//	x0=[0.1 , 0.1 , 0.1];
+	//	intcon = [2]
+  	//	A=[];
+  	//	b=[];
+  	//	Aeq=[];
+  	// 	beq=[];
+  	//	lb=[];
+  	//	ub=[];
+  	//	//Nonlinear constraints  
+  	//	function [c,ceq,cg,cgeq]=nlc(x)
+  	//		c = [x(1)^2 - x(2)^2 + x(3)^2 - 2 , x(1)^2 + x(2)^2 + x(3)^2 - 10];
+  	//  	ceq = [];
+  	//		cg=[2*x(1) , -2*x(2) , 2*x(3) ; 2*x(1) , 2*x(2) , 2*x(3)];
+  	//		cgeq=[];
+  	//	endfunction
+  	//	//Options  
+  	//	options=list("MaxIter", [1500], "CpuTime", [500], "GradObj", "on","GradCon", "on");
+  	//    //Calling Ipopt
+  	//	[x,fval,exitflag,output] =intfmincon(f, x0,intcon,A,b,Aeq,beq,lb,ub,nlc,options)
+	// // Press ENTER to continue
+  	//
+  	// Examples
+  	//    //The below problem is an unbounded problem:
+  	//	//Find x in R^3 such that it minimizes:
+  	//    //f(x)= -(x1^2 + x2^2 + x3^2)
+  	//    //x0=[0.1 , 0.1 , 0.1]
+  	//    //  x1 <= 0
+  	//    //  x2 <= 0
+  	//    //  x3 <= 0
+  	//    //Objective function to be minimised
+  	//    function y=f(x)
+  	//		y=-(x(1)^2+x(2)^2+x(3)^2);
+  	//	endfunction
+  	//	//Starting point, linear constraints and variable bounds  
+  	//	x0=[0.1 , 0.1 , 0.1];
+	//	intcon = [3]
+  	//	A=[];
+  	//	b=[];
+  	//	Aeq=[];
+  	// 	beq=[];
+  	//	lb=[];
+  	//	ub=[0,0,0];
+  	//	//Options
+  	//	options=list("MaxIter", [1500], "CpuTime", [500]);
+  	//    //Calling Ipopt
+  	//	[x,fval,exitflag,grad,hessian] =intfmincon(f, x0,intcon,A,b,Aeq,beq,lb,ub,[],options)
+	// // Press ENTER to continue
+  	//
+  	// Examples
+  	//    //The below problem is an infeasible problem:
+  	//	//Find x in R^3 such that in minimizes:
+  	//    //f(x)=x1*x2 + x2*x3
+  	//    //x0=[1,1,1]
+  	//    //constraint-1 (c1): x1^2 <= 1
+  	//    //constraint-2 (c2): x1^2 + x2^2 <= 1    
+  	//    //constraint-3 (c3): x3^2 <= 1  
+  	//    //constraint-4 (c4): x1^3 = 0.5  
+  	//    //constraint-5 (c5): x2^2 + x3^2 = 0.75
+  	//    // 0 <= x1 <=0.6
+  	//    // 0.2 <= x2 <= inf
+  	//    // -inf <= x3 <= 1
+  	//    //Objective function to be minimised
+  	//    function [y,dy]=f(x)
+  	//		y=x(1)*x(2)+x(2)*x(3);
+  	//		dy= [x(2),x(1)+x(3),x(2)];
+  	//	  endfunction
+  	//	//Starting point, linear constraints and variable bounds  
+  	//	x0=[1,1,1];
+	//	intcon = [2]
+  	//	A=[];
+  	//	b=[];
+  	//	Aeq=[];
+  	// 	beq=[];
+  	//	lb=[0 0.2,-%inf];
+  	//	ub=[0.6 %inf,1];
+  	//	//Nonlinear constraints  
+  	//	function [c,ceq,cg,cgeq]=nlc(x)
+  	//		c=[x(1)^2-1,x(1)^2+x(2)^2-1,x(3)^2-1];
+  	//		ceq=[x(1)^3-0.5,x(2)^2+x(3)^2-0.75];
+  	//		cg = [2*x(1),0,0;2*x(1),2*x(2),0;0,0,2*x(3)];
+  	//		cgeq = [3*x(1)^2,0,0;0,2*x(2),2*x(3)];
+  	//	endfunction
+   	//	//Options  
+  	//	options=list("MaxIter", [1500], "CpuTime", [500], "GradObj", "on","GradCon", "on");
+  	//    //Calling Ipopt
+  	//	[x,fval,exitflag,grad,hessian] =intfmincon(f, x0,intcon,A,b,Aeq,beq,lb,ub,nlc,options)
+ 	// // Press ENTER to continue
 	// Authors
 	// Harpreet Singh
 
@@ -146,14 +232,14 @@ function [xopt,fopt,exitflag,gradient,hessian] = intfmincon (varargin)
 	//Storing the Input Parameters  
  	fun = varargin(1);
  	x0     = varargin(2);
-  intcon = varargin(3); 
-  A      = varargin(4);
-  b      = varargin(5);
-  Aeq    = [];
-  beq    = [];
-  lb       = [];
-  ub       = [];
-  nlc      = [];
+	intcon = varargin(3); 
+	A      = varargin(4);
+	b      = varargin(5);
+	Aeq    = [];
+	beq    = [];
+	lb       = [];
+	ub       = [];
+	nlc      = [];
     
   if (rhs>5) then
     Aeq    = varargin(6);
@@ -282,9 +368,9 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
         options(10) = param(2*i);
       case 'gradobj' then
         Checktype("intfmincon_options", param(2*i), param(2*i-1), 2*i, "string");
-        if(convstr(options(2*i),'l') == "on") then
+        if(convstr(param(2*i),'l') == "on") then
           options(12) = "on"
-        elseif(convstr(options(2*i),'l') == "off") then
+        elseif(convstr(param(2*i),'l') == "off") then
           options(12) = "off"
         else
           error(999, 'Unknown string passed in gradobj.');
@@ -292,11 +378,11 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
       case 'hessian' then
         Checktype("intfmincon_options", param(2*i), param(2*i-1), 2*i, "function");
         options(14) = param(2*i);
-      case 'GradCon' then
+      case 'gradcon' then
         Checktype("intfmincon_options", param(2*i), param(2*i-1), 2*i, "string");
-        if(convstr(options(2*i),'l') == "on") then
+        if(convstr(param(2*i),'l') == "on") then
           options(16) = "on"
-        elseif(convstr(options(2*i),'l') == "off") then
+        elseif(convstr(param(2*i),'l') == "off") then
           options(16) = "off"
         else
           error(999, 'Unknown string passed in gradcon.');
@@ -315,19 +401,20 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
   end
 
   if(options(12) == "on") then
-       if(execstr('[grad_y,grad_dy]=fun(x1)','errcatch')==59) then
+       if(execstr('[grad_y,grad_dy]=fun(x0)','errcatch')==59) then
         errmsg = msprintf(gettext("%s: Gradient of objective function is not provided"), "intfmincon");
         error(errmsg);
       end
+	if(grad_dy<>[]) then
       Checkvector("intfmincon_options", grad_dy, "dy", 12, nbVar);
+	end
   end
 
   if(options(14) == "on") then
-      if(execstr('[hessian_y,hessian_dy,hessian]=fun(x1)','errcatch')==59) then
+      if(execstr('[hessian_y,hessian_dy,hessian]=fun(x0)','errcatch')==59) then
         errmsg = msprintf(gettext("%s: Gradient of objective function is not provided"), "intfmincon");
         error(errmsg);
       end
-
       if ( ~isequal(size(hessian) == [nbVar nbVar]) ) then
         errmsg = msprintf(gettext("%s: Size of hessian should be nbVar X nbVar"), "intfmincon");
         error(errmsg);
@@ -338,7 +425,8 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
   numNlec = 0;
   numNlc = 0;
 
-  if (type(nlc) == 13 | type(nlc) == 11) then    
+  if (type(nlc) == 13 | type(nlc) == 11) then
+	[sample_c,sample_ceq] = nlc(x0);
       if(execstr('[sample_c,sample_ceq] = nlc(x0)','errcatch')==21) then
         errmsg = msprintf(gettext("%s: Non-Linear Constraint function and x0 did not match"), intfmincon);
         error(errmsg);
@@ -387,6 +475,8 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
 
     function [y,check] = _addnlc(x)
     x= x(:)
+	c = []
+	ceq = []
       try
         if((type(nlc) == 13 | type(nlc) == 11) & numNlc~=0) then
            [c,ceq]=nlc(x)
@@ -404,7 +494,10 @@ options = list('integertolerance',1d-06,'maxnodes',2147483647,'cputime',1d10,'al
     function [dy,check] = _gradnlc(x) 
       if (options(16) =="on") then
         try
-          [y,dy]=nlc(x)
+          [y1,y2,dy1,dy2]=nlc(x)
+		  //Adding derivative of Linear Constraint
+		  dylin = [A;Aeq]
+		  dy = [dy1;dy2;dylin];
           [dy,check] = checkIsreal(dy)
         catch
           dy = 0;

@@ -1,6 +1,6 @@
 // Copyright (C) 2015 - IIT Bombay - FOSSEE
 //
-// Author: Harpreet Singh, Pranav Deshpande and Akshay Miterani
+// Author: Harpreet Singh
 // Organization: FOSSEE, IIT Bombay
 // Email: toolbox@scilab.in
 // This file must be used under the terms of the CeCILL.
@@ -29,7 +29,7 @@ using namespace Bonmin;
 
 minbndTMINLP::~minbndTMINLP()
 {
-	free(finalX_);
+	if(finalX_) delete[] finalX_;
 }
 
 // Set the type of every variable - CONTINUOUS or INTEGER
@@ -193,7 +193,7 @@ void minbndTMINLP::finalize_solution(SolverReturn status,Index n, const Number* 
 	status_ = status;
 	if(status==0 ||status== 3)
 	{
-		finalX_ = (double*)malloc(sizeof(double) * numVars_ * 1);
+		finalX_ =  new double[n];
 		for (Index i=0; i<numVars_; i++) 
 		{
 	    		 finalX_[i] = x[i];
