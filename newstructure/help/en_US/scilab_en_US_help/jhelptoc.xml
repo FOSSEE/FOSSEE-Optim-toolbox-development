@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN" "http://java.sun.com/products/javahelp/toc_1_0.dtd">
+<toc version="1.0">
+<tocitem target="index" text="FOSSEE Optimization Toolbox">
+<tocitem target="section_2f30ec7805b02b8760d8add3187208be" text="FOSSEE Optimization Toolbox">
+<tocitem target="cbcintlinprog" text="cbcintlinprog"/>
+<tocitem target="intfminbnd" text="intfminbnd"/>
+<tocitem target="intfmincon" text="intfmincon"/>
+<tocitem target="intfminimax" text="intfminimax"/>
+<tocitem target="intfminunc" text="intfminunc"/>
+<tocitem target="intqpipopt" text="intqpipopt"/>
+</tocitem>
+</tocitem>
+</toc>

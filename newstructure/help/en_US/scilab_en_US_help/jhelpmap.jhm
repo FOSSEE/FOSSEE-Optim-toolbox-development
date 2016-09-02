@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE map PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 1.0//EN" "http://java.sun.com/products/javahelp/map_1_0.dtd">
+<map version="1.0">
+<mapID target="index" url="index.html"/>
+<mapID target="section_2f30ec7805b02b8760d8add3187208be" url="section_2f30ec7805b02b8760d8add3187208be.html"/>
+<mapID target="cbcintlinprog" url="cbcintlinprog.html"/>
+<mapID target="intfminbnd" url="intfminbnd.html"/>
+<mapID target="intfmincon" url="intfmincon.html"/>
+<mapID target="intfminimax" url="intfminimax.html"/>
+<mapID target="intfminunc" url="intfminunc.html"/>
+<mapID target="intqpipopt" url="intqpipopt.html"/>
+</map>

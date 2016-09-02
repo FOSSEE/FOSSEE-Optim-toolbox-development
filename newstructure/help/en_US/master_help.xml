@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book [
+<!--Begin Entities-->
+<!ENTITY a9329a0d53661bb2d81d90b27f1c88ca0 SYSTEM "/home/fossee/symphony-work/fminfunctions-master/newstructure/help/en_US/cbcintlinprog.xml">
+<!ENTITY a6fbb041a3f7f80f35d8aeed18b3c9747 SYSTEM "/home/fossee/symphony-work/fminfunctions-master/newstructure/help/en_US/intfminbnd.xml">
+<!ENTITY a0f250752f9f8370f313a4a7e9ff6ad3f SYSTEM "/home/fossee/symphony-work/fminfunctions-master/newstructure/help/en_US/intfmincon.xml">
+<!ENTITY a257444ebcd118cf85c2ba7a95473117c SYSTEM "/home/fossee/symphony-work/fminfunctions-master/newstructure/help/en_US/intfminimax.xml">
+<!ENTITY a3691830d1b123907d1dfab057ceb7548 SYSTEM "/home/fossee/symphony-work/fminfunctions-master/newstructure/help/en_US/intfminunc.xml">
+<!ENTITY adccedc981fc40a046b9fa80097caa93d SYSTEM "/home/fossee/symphony-work/fminfunctions-master/newstructure/help/en_US/intqpipopt.xml">
+<!--End Entities-->
+]>
+<book version="5.0-subset Scilab" xml:lang="en_US"
+      xmlns="http://docbook.org/ns/docbook"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:svg="http://www.w3.org/2000/svg"
+      xmlns:mml="http://www.w3.org/1998/Math/MathML"
+      xmlns:html="http://www.w3.org/1999/xhtml"
+      xmlns:db="http://docbook.org/ns/docbook">
+  <info xml:id='fossee_optimization_toolbox_manual'>
+    <title>FOSSEE Optimization Toolbox</title>
+  </info>
+
+<part xml:id='section_2f30ec7805b02b8760d8add3187208be'>
+<title>FOSSEE Optimization Toolbox</title>
+&a9329a0d53661bb2d81d90b27f1c88ca0;
+&a6fbb041a3f7f80f35d8aeed18b3c9747;
+&a0f250752f9f8370f313a4a7e9ff6ad3f;
+&a257444ebcd118cf85c2ba7a95473117c;
+&a3691830d1b123907d1dfab057ceb7548;
+&adccedc981fc40a046b9fa80097caa93d;
+</part>
+</book>
